@@ -21,7 +21,7 @@ public class TodoService {
 
     // 로그인한 Todo 항목 반환
     public List<Todo> findTodosByUserId(String userId) {
-        return todoRepository.findByUser_UserId(userId); // userId 기반으로 필터링
+        return todoRepository.findByUserId(userId); // userId 기반으로 필터링
     }
 
     // listId를 통해 Todo 항목을 조회하는 메서드

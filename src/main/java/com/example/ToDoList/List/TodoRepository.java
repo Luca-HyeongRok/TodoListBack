@@ -11,5 +11,5 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {
     // 추가적인 쿼리 메서드를 정의할 수 있다.
     @Query("SELECT t FROM Todo t WHERE t.user.userId = :userId")
     List<Todo> findByUserId(@Param("userId") String userId);
-
 }
+
