@@ -1,5 +1,6 @@
 package com.example.ToDoList.user;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ public class UserService {
     //private final BCryptPasswordEncoder passwordEncoder; // 비밀번호를 암호화하기 위해 사용
 
     // 회원가입
+    @Transactional
     public String registerUser(UserDTO userDto) {
         // userId 체크
         Optional<User> existingUser = userRepository.findByUserId(userDto.getUserId());
@@ -34,18 +36,4 @@ public class UserService {
 
         return "회원가입 성공"; // 회원가입 완료 메시지 반환
     }
-
-    // 로그인
-    public String loginUser(UserDTO userDto) {
-        // 입력한 userId를 DB에서 찾기
-        Optional<User> user = userRepository.findByUserId(userDto.getUserId());
-
-        // DB에 해당 userId가 존재하고, 입력한 비밀번호가 저장된 비밀번호와 일치하는지 확인
-        if (user.isPresent() && userDto.getPassword().equals(user.get().getPassword())) {
-            return "로그인 성공";
-        }
-
-        return "아이디 또는 비밀번호가 틀렸습니다.";
-    }
-
 }

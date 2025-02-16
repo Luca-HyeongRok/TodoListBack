@@ -22,7 +22,7 @@ public class Todo {
     private Timestamp endDate;
     private boolean done;
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }

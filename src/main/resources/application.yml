@@ -16,3 +16,7 @@ spring:
   sql:
     init:
       data-locations: classpath:data.sql  #파일 경로 설정
+server:
+    servlet:
+       session:
+          tracking-modes: cookie  #세션을 쿠키로 관리

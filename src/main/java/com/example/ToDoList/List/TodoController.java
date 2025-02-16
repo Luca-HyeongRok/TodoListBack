@@ -1,61 +1,82 @@
 package com.example.ToDoList.List;
 
 import com.example.ToDoList.user.User;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/todos")
 public class TodoController {
 
     private final TodoService todoService;
+    private final TodoRepository todoRepository;
 
     @Autowired
-    public TodoController(TodoService todoService) {
+    public TodoController(TodoService todoService, TodoRepository todoRepository) {
         this.todoService = todoService;
+        this.todoRepository = todoRepository;
     }
 
     // 로그인한 사용자의 Todo 목록만 가져오기
-    // GET 대신 POST를 사용하는 이유: 비밀번호 유출 방지
     @PostMapping("/user")
-    public List<Todo> getTodos(@RequestBody User user) {
-        return todoService.findTodosByUserId(user.getUserId());
+    public List<Todo> getTodos(@RequestBody Map<String, String> requestBody) {
+        String userId = requestBody.get("userId");
+
+        if (userId == null || userId.isEmpty()) {
+            throw new IllegalArgumentException("userId가 필요합니다.");
+        }
+
+        return todoService.findTodosByUserId(userId);
     }
 
-    // listId Todo 항목을 가져오기 (GET)
+    // 특정 Todo 가져오기
     @GetMapping("/{listId}")
     public Todo getTodoByListId(@PathVariable Integer listId) {
-        return todoService.getTodoById(listId);  // listId를 이용해 특정 Todo 항목을 반환
+        return todoService.getTodoById(listId);
     }
 
-    // 체크박스 상태 변경 (isDone 필드 업데이트) (PATCH)
+    // 체크박스 상태 변경
     @PatchMapping("/{listId}")
     public Todo updateTodoCheck(@PathVariable Integer listId, @RequestBody Todo updatedTodo) {
-        System.out.println("TodoController: 업데이트 요청받음. Todo ID: " + listId);
         return todoService.updateTodoCheckbox(listId, updatedTodo);
     }
 
-    // Todo 내용, 중요도, 날짜 변경 (PATCH)
+    // Todo 내용, 중요도, 날짜 변경
     @PatchMapping("/edit/{listId}")
     public Todo updateTodo(@PathVariable Integer listId, @RequestBody Todo updatedTodo) {
-        System.out.println("Todo 수정 요청: ID = " + listId);
+        System.out.println("Controller 111111111111111111111111111111");
         return todoService.updateTodo(listId, updatedTodo);
     }
 
-    // listId로 Todo 삭제 (DELETE)
+    // Todo 삭제
     @DeleteMapping("/{listId}")
     public ResponseEntity<String> deleteTodo(@PathVariable Integer listId) {
-        System.out.println("삭제 요청 받은 Todo ID: " + listId);
-        todoService.deleteTodo(listId);  // 서비스 레이어에서 실제 삭제 처리
+        todoService.deleteTodo(listId);
         return ResponseEntity.ok("삭제 완료");
     }
 
-    // 새로운 Todo 생성 (POST)
+    // 새로운 Todo 생성
     @PostMapping
-    public Todo createTodo(@RequestBody Todo newTodo) {
-        return todoService.createTodo(newTodo);  // 서비스 레이어에 위임하여 Todo 생성
+    public ResponseEntity<?> createTodo(HttpServletRequest request, @RequestBody Todo newTodo) {
+
+        HttpSession session = request.getSession();
+        User loggedInUser = (User) session.getAttribute("user");
+
+        if (loggedInUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        newTodo.setUser(loggedInUser); // 세션에서 가져온 userId 설정
+
+        Todo savedTodo = todoService.createTodo(newTodo);
+        return ResponseEntity.ok(savedTodo);
     }
 }

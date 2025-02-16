@@ -21,7 +21,7 @@ public class TodoService {
 
     // 로그인한 Todo 항목 반환
     public List<Todo> findTodosByUserId(String userId) {
-        return todoRepository.findByUserId(userId); // userId 기반으로 필터링
+        return todoRepository.findByUser_UserId(userId); // userId 기반으로 필터링
     }
 
     // listId를 통해 Todo 항목을 조회하는 메서드
@@ -41,6 +41,7 @@ public class TodoService {
     }
 
     // Todo 수정 메서드
+    @Transactional
     public Todo updateTodo(Integer listId, Todo updatedTodo) {
         Optional<Todo> optionalTodo = todoRepository.findById(listId);
 
@@ -61,6 +62,7 @@ public class TodoService {
     }
 
     // 체크박스 Todo 상태 업데이트
+    @Transactional
     public Todo updateTodoCheckbox(Integer listId, Todo updatedTodo) {
         // Todo 항목을 찾음
         Optional<Todo> optionalTodo = todoRepository.findById(listId);
@@ -91,6 +93,7 @@ public class TodoService {
 
 
     // Todo 삭제
+    @Transactional
     public void deleteTodo(Integer listId) {
         System.out.println("Todo 삭제 요청: ID = " + listId);  // 삭제 요청 로그
 
