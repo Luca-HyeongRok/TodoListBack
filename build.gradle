@@ -36,7 +36,10 @@ dependencies {
 
 	// 개발 도구 & H2 Database
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.h2database:h2'
+	//runtimeOnly 'com.h2database:h2'
+
+	// ✅ MySQL 드라이버 추가
+	runtimeOnly 'com.mysql:mysql-connector-j:8.3.0'
 
 	// Lombok (Getter, Setter 자동 생성)
 	compileOnly 'org.projectlombok:lombok:1.18.30'

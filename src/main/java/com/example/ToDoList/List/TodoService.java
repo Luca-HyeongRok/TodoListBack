@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,8 +45,9 @@ public class TodoService {
     // Todo 수정 메서드
     @Transactional
     public Todo updateTodo(Integer listId, Todo updatedTodo) {
+        System.out.println("Service 111111111111111111111111111111");
         Optional<Todo> optionalTodo = todoRepository.findById(listId);
-
+        System.out.println("Service 2222222222222222222222222222");
         if (optionalTodo.isPresent()) {
             Todo todo = optionalTodo.get();
 
@@ -53,7 +56,7 @@ public class TodoService {
             todo.setPriority(updatedTodo.getPriority());
             todo.setStartDate(updatedTodo.getStartDate());
             todo.setEndDate(updatedTodo.getEndDate());
-
+            System.out.println("Service 33333333333333333333333333333");
             // DB에 저장 후 반환
             return todoRepository.save(todo);
         } else {
@@ -111,4 +114,8 @@ public class TodoService {
         return todoRepository.save(newTodo);  // Repository에서 새 Todo 항목을 저장하고 반환
     }
 
+    // 날짜 변경시 리스트 목록
+    public List<Todo> findTodosByDate(String userId, LocalDateTime startDate, LocalDateTime endDate) {
+        return todoRepository.findByUserIdAndDate(userId, startDate, endDate);
+    }
 }
