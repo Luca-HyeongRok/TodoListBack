@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -97,7 +98,7 @@ public class TodoController {
     @GetMapping("/date")
     public ResponseEntity<?> getTodosByDate(@RequestParam String date, HttpServletRequest request) {
         try {
-            // ✅ 세션 확인
+            // 세션 확인
             HttpSession session = request.getSession(false);
             if (session == null || session.getAttribute("user") == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
@@ -105,7 +106,7 @@ public class TodoController {
 
             User user = (User) session.getAttribute("user");
 
-            // ✅ 날짜 변환 (String -> LocalDateTime, 00:00:00 기본값 추가)
+            //  날짜 변환 (String -> LocalDateTime, 00:00:00 기본값 추가)
             LocalDateTime startDateTime;
             LocalDateTime endDateTime;
             try {
@@ -117,7 +118,7 @@ public class TodoController {
                         .body("잘못된 날짜 형식입니다. YYYY-MM-DD 형식이어야 합니다.");
             }
 
-            // ✅ 데이터 조회 (LocalDateTime 사용)
+            // 데이터 조회 (LocalDateTime 사용)
             List<Todo> todos = todoService.findTodosByDate(user.getUserId(), startDateTime, endDateTime);
             return ResponseEntity.ok(todos);
 
@@ -127,4 +128,15 @@ public class TodoController {
                     .body("서버 내부 오류 발생: " + e.getMessage());
         }
     }
+    // 검색 정보 불러오기
+    @GetMapping("/search")
+    public ResponseEntity<List<Todo>> searchTodos(@RequestParam(name = "keyword", required = false) String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Collections.emptyList());
+        }
+
+        List<Todo> results = todoService.searchTodos(keyword);
+        return ResponseEntity.ok(results);
+    }
+
 }

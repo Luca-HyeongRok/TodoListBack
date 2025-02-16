@@ -2,6 +2,7 @@ package com.example.ToDoList.List;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -118,4 +119,10 @@ public class TodoService {
     public List<Todo> findTodosByDate(String userId, LocalDateTime startDate, LocalDateTime endDate) {
         return todoRepository.findByUserIdAndDate(userId, startDate, endDate);
     }
+
+    // 검색정보 불러오기
+    public List<Todo> searchTodos(String keyword) {
+        return todoRepository.findByContentContainingIgnoreCase(keyword);
+    }
+
 }

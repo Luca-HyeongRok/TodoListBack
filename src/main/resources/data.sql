@@ -1,6 +1,6 @@
-INSERT INTO users (user_id, username, password) VALUES ('testUser', '테스트 유저', '1234');
+INSERT IGNORE INTO users (user_id, username, password) VALUES ('testUser', '테스트 유저', '1234');
 
-INSERT INTO list_tb (content, priority, start_date, end_date, done, user_id)
+INSERT IGNORE INTO list_tb (content, priority, start_date, end_date, done, user_id)
 VALUES ('밥 먹기', 2, '2025-02-09 10:20:20', '2025-02-14 20:20:20', false, 'testUser');
 
 INSERT INTO list_tb (content, priority, start_date, end_date, done, user_id)
