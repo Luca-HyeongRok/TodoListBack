@@ -116,7 +116,7 @@ public class TodoService {
     }
 
     // 날짜 변경시 리스트 목록
-    public List<Todo> findTodosByDate(String userId, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<Todo> findTodosByDateSorted(String userId, LocalDateTime startDate, LocalDateTime endDate) {
         return todoRepository.findByUserIdAndDate(userId, startDate, endDate);
     }
 
@@ -124,5 +124,4 @@ public class TodoService {
     public List<Todo> searchTodos(String keyword) {
         return todoRepository.findByContentContainingIgnoreCase(keyword);
     }
-
 }

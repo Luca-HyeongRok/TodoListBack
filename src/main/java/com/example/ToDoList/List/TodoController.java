@@ -73,10 +73,11 @@ public class TodoController {
 
     // Todo 삭제
     @DeleteMapping("/{listId}")
-    public ResponseEntity<String> deleteTodo(@PathVariable Integer listId) {
+    public ResponseEntity<Map<String, String>> deleteTodo(@PathVariable Integer listId) {
         todoService.deleteTodo(listId);
-        return ResponseEntity.ok("삭제 완료");
+        return ResponseEntity.ok(Collections.singletonMap("message", "삭제 완료"));
     }
+
 
     // 새로운 Todo 생성
     @PostMapping
@@ -94,40 +95,34 @@ public class TodoController {
         Todo savedTodo = todoService.createTodo(newTodo);
         return ResponseEntity.ok(savedTodo);
     }
-    // 날짜 변경시 리스트 목록
+
+    // 날짜 변경시 리스트 목록 (중요도 높은 순 정렬)
     @GetMapping("/date")
     public ResponseEntity<?> getTodosByDate(@RequestParam String date, HttpServletRequest request) {
-        try {
-            // 세션 확인
-            HttpSession session = request.getSession(false);
-            if (session == null || session.getAttribute("user") == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-            }
-
-            User user = (User) session.getAttribute("user");
-
-            //  날짜 변환 (String -> LocalDateTime, 00:00:00 기본값 추가)
-            LocalDateTime startDateTime;
-            LocalDateTime endDateTime;
-            try {
-                LocalDate selectedDate = LocalDate.parse(date);
-                startDateTime = selectedDate.atStartOfDay(); // 2025-02-16 00:00:00
-                endDateTime = selectedDate.atTime(23, 59, 59); // 2025-02-16 23:59:59
-            } catch (DateTimeParseException e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("잘못된 날짜 형식입니다. YYYY-MM-DD 형식이어야 합니다.");
-            }
-
-            // 데이터 조회 (LocalDateTime 사용)
-            List<Todo> todos = todoService.findTodosByDate(user.getUserId(), startDateTime, endDateTime);
-            return ResponseEntity.ok(todos);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("서버 내부 오류 발생: " + e.getMessage());
+        // 세션 확인
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
+
+        User user = (User) session.getAttribute("user");
+
+        // 날짜 변환
+        LocalDateTime startDateTime = LocalDate.parse(date).atStartOfDay();
+        LocalDateTime endDateTime = startDateTime.plusDays(1).minusSeconds(1);
+
+
+
+
+        List<Todo> todos = todoService.findTodosByDateSorted(user.getUserId(), startDateTime, endDateTime);
+
+
+
+        return ResponseEntity.ok(todos);
     }
+
+
+
     // 검색 정보 불러오기
     @GetMapping("/search")
     public ResponseEntity<List<Todo>> searchTodos(@RequestParam(name = "keyword", required = false) String keyword) {
